@@ -1,0 +1,5 @@
+# macOS
+.DS_Store
+
+# Large voice model files (do not commit)
+*.onnx
