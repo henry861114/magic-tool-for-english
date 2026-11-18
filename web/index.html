@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#F2913D">
+<title>学英语神器</title>
+<link rel="stylesheet" href="assets/app.css?v=20261114-res">
+<script>
+/* 分辨率检测：优先读取 Android 原生 DisplayMetrics（物理像素 + 密度），
+   再换算成 WebView 实际使用的逻辑像素（dp/CSS px）来选择布局。 */
+(function () {
+  var LAYOUTS = [
+    { min: 1900, key: 'xl', name: '超大屏 · 7 列', cols: 7 },
+    { min: 1600, key: 'lg', name: '大屏 · 6 列', cols: 6 },
+    { min: 1280, key: 'md', name: '平板横屏 · 5 列', cols: 5 },
+    { min: 1024, key: 'tab', name: '平板 · 4 列', cols: 4 },
+    { min: 720, key: 'tab-sm', name: '小平板 · 3 列', cols: 3 },
+    { min: 0, key: 'phone', name: '手机 · 2 列', cols: 2 }
+  ];
+  var RES = [
+    { min: 2560, name: '2560' }, { min: 2160, name: '2160' },
+    { min: 1920, name: '1920' }, { min: 1600, name: '1600' },
+    { min: 1280, name: '1280' }, { min: 1024, name: '1024' },
+    { min: 0, name: 'small' }
+  ];
+  function pick(list, n) {
+    for (var i = 0; i < list.length; i++) if (n >= list[i].min) return list[i];
+    return list[list.length - 1];
+  }
+  function detect() {
+    var b = null;
+    try {
+      if (window.AndroidBridge && AndroidBridge.getScreenInfo) {
+        b = JSON.parse(AndroidBridge.getScreenInfo());
+      }
+    } catch (e) { b = null; }
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = window.innerWidth || document.documentElement.clientWidth ||
+      (window.screen && screen.width) || 0;
+    var cssH = window.innerHeight || document.documentElement.clientHeight ||
+      (window.screen && screen.height) || 0;
+    var wPx = (b && b.widthPx) || Math.round(cssW * dpr);
+    var hPx = (b && b.heightPx) || Math.round(cssH * dpr);
+    var longEdge = Math.max(wPx, hPx);
+    var shortEdge = Math.min(wPx, hPx);
+    var density = (b && b.density) || dpr || 1;
+    // 原生 widthDp 与 WebView 逻辑宽度一致时，以原生读数为准；差异过大说明
+    // 浏览器度量异常，退回实测 innerWidth，避免按错误宽度排版。
+    var nativeW = (b && b.widthDp) || 0;
+    var layoutWidth = cssW;
+    var mismatch = false;
+    if (nativeW && cssW) {
+      if (Math.abs(nativeW - cssW) / Math.max(nativeW, cssW) <= 0.15) layoutWidth = nativeW;
+      else mismatch = true;
+    }
+    var layout = pick(LAYOUTS, layoutWidth);
+    var res = pick(RES, longEdge);
+    var orientation = hPx >= wPx ? 'portrait' : 'landscape';
+    var root = document.documentElement;
+    root.setAttribute('data-res', res.name);
+    root.setAttribute('data-layout', layout.key);
+    root.setAttribute('data-orientation', orientation);
+    root.setAttribute('data-physical', longEdge + 'x' + shortEdge);
+    root.style.setProperty('--layout-cols', String(layout.cols));
+    window.EG_SCREEN = {
+      widthPx: wPx, heightPx: hPx,
+      longEdgePx: longEdge, shortEdgePx: shortEdge,
+      density: Math.round(density * 100) / 100,
+      densityDpi: (b && b.densityDpi) || Math.round(density * 160),
+      cssWidth: Math.round(cssW), cssHeight: Math.round(cssH),
+      nativeWidthDp: nativeW, layoutWidth: Math.round(layoutWidth),
+      mismatch: mismatch,
+      orientation: orientation,
+      res: res.name, layout: layout.key, layoutName: layout.name,
+      physical: longEdge + '×' + shortEdge,
+      native: !!b
+    };
+    return window.EG_SCREEN;
+  }
+  window.EGDetectScreen = detect;
+  detect();
+  var timer = null;
+  function later() { clearTimeout(timer); timer = setTimeout(detect, 120); }
+  window.addEventListener('resize', later);
+  window.addEventListener('orientationchange', function () { setTimeout(detect, 220); });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', detect);
+  }
+})();
+</script>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ============ 首页 ============ -->
+  <section class="screen" id="screen-home">
+    <header class="home-hero">
+      <div class="hero-top">
+        <div class="hero-title-wrap">
+          <p class="hero-date" id="heroDate">11 月 8 日 · 星期日</p>
+          <h1>学英语神器</h1>
+        </div>
+        <button class="icon-btn glass" id="homeMeBtn" aria-label="我的">
+          <span class="avatar">🙂</span>
+        </button>
+      </div>
+      <p class="hero-sub">自然拼读拆单词，一遍就能记住 ✨</p>
+      <div class="hero-stats">
+        <span class="hero-chip">⭐ <b id="statStars">0</b> 星星</span>
+        <span class="hero-chip">🔥 <b id="statStreak">0</b> 天连续</span>
+        <span class="hero-chip">📚 <b id="statLearned">0</b> 已掌握</span>
+      </div>
+      <div class="hero-bubble b1">A</div>
+      <div class="hero-bubble b2">B</div>
+      <div class="hero-bubble b3">C</div>
+    </header>
+
+    <main class="home-main">
+      <div class="progress-card">
+        <div class="ring" id="goalRing">
+          <div class="ring-inner">
+            <b id="goalDone">0</b>
+            <span>/ <i id="goalTotal">10</i></span>
+          </div>
+        </div>
+        <div class="progress-info">
+          <h2>今日学习目标</h2>
+          <p id="goalText">再学 10 个单词就达标啦</p>
+          <button class="btn-primary sm" id="continueBtn">继续学习 <span>→</span></button>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2>课程 Units</h2>
+        <span id="unitSummary">9 个单元</span>
+      </div>
+      <div class="grade-scroll">
+        <div class="grade-chips" id="gradeChips"></div>
+      </div>
+      <div class="term-scroll">
+        <div class="term-chips" id="termChips"></div>
+      </div>
+      <div class="unit-list" id="unitList"></div>
+
+      <div class="section-head"><h2>快捷入口</h2></div>
+      <div class="quick-grid">
+        <button class="quick-tile" data-go="review" data-tab="wrong">
+          <span class="q-emoji">🔁</span>
+          <span class="q-title">错词本</span>
+          <span class="q-sub" id="quickWrong">0 个待复习</span>
+        </button>
+        <button class="quick-tile" data-go="review" data-tab="fav">
+          <span class="q-emoji">⭐</span>
+          <span class="q-title">我的收藏</span>
+          <span class="q-sub" id="quickFav">0 个单词</span>
+        </button>
+        <button class="quick-tile" data-go="consolidate">
+          <span class="q-emoji">🧠</span>
+          <span class="q-title">巩固知识库</span>
+          <span class="q-sub">自由选词强化</span>
+        </button>
+        <button class="quick-tile" data-go="me">
+          <span class="q-emoji">⚙️</span>
+          <span class="q-title">设置</span>
+          <span class="q-sub">年级 · 口音 · 语速</span>
+        </button>
+      </div>
+
+      <div class="home-tip">
+        <b>💡 四步学习法</b>
+        <span>学 → 练 → 拆拼 → 写，每天 10 分钟，轻松记住单词。</span>
+      </div>
+    </main>
+  </section>
+
+  <!-- ============ 学单词 ============ -->
+  <section class="screen learn-screen" id="screen-learn">
+    <div class="learn-shell">
+      <header class="learn-hero">
+        <div class="learn-nav">
+          <button class="icon-btn glass back-btn" id="learnBack" aria-label="返回"></button>
+          <div class="learn-title">
+            <h1 id="learnUnitTitle">Unit 1</h1>
+            <p id="learnUnitTheme">我的教室</p>
+          </div>
+          <button class="icon-btn glass" id="learnFav" aria-label="收藏"></button>
+        </div>
+        <div class="word-strip-wrap">
+          <div class="word-strip" id="wordStrip"></div>
+        </div>
+      </header>
+
+      <div class="learn-scroll" id="learnScroll">
+        <div class="learn-card">
+          <div class="stepper" id="stepper">
+            <div class="step-progress"><i id="stepProgress"></i></div>
+            <button class="step" data-step="0"><span class="dot">学</span></button>
+            <button class="step" data-step="1"><span class="dot">练</span></button>
+            <button class="step" data-step="2"><span class="dot wide">拆拼</span></button>
+            <button class="step" data-step="3"><span class="dot">写</span></button>
+          </div>
+          <div class="stage" id="stage"></div>
+        </div>
+        <div class="learn-tip">💡 点字母块可以听发音，跟着读一读吧</div>
+      </div>
+
+      <footer class="learn-footer">
+        <button class="btn-ghost" id="prevWord">上一词</button>
+        <button class="btn-primary" id="nextWord">下一词</button>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ============ 复习 ============ -->
+  <section class="screen" id="screen-review">
+    <header class="sub-hero">
+      <div class="sub-hero-top">
+        <button class="icon-btn glass back-btn" id="reviewBack" aria-label="返回"></button>
+        <h1>复习本</h1>
+        <span class="icon-btn glass ghost-icon">📒</span>
+      </div>
+      <div class="segmented" id="reviewTabs">
+        <button class="seg active" data-tab="wrong">错词本</button>
+        <button class="seg" data-tab="fav">收藏</button>
+        <button class="seg" data-tab="done">已掌握</button>
+      </div>
+    </header>
+    <main class="sub-main">
+      <p class="review-hint" id="reviewHint"></p>
+      <div class="review-list" id="reviewList"></div>
+    </main>
+  </section>
+
+  <!-- ============ 我的 / 设置 ============ -->
+  <section class="screen" id="screen-me">
+    <header class="sub-hero me-hero">
+      <div class="sub-hero-top">
+        <button class="icon-btn glass back-btn" id="meBack" aria-label="返回"></button>
+        <h1>我的</h1>
+        <span class="icon-btn glass ghost-icon">⚙️</span>
+      </div>
+      <div class="me-summary">
+        <div class="me-avatar">🎓</div>
+        <div>
+          <h2>小小英语家</h2>
+          <p>每天进步一点点，你就是单词大王！</p>
+        </div>
+      </div>
+    </header>
+    <main class="sub-main">
+      <div class="stat-row">
+        <div class="stat-card"><b id="meLearned">0</b><span>已掌握</span></div>
+        <div class="stat-card"><b id="meStars">0</b><span>星星</span></div>
+        <div class="stat-card"><b id="meStreak">0</b><span>连续天数</span></div>
+      </div>
+
+      <div class="section-head"><h2>学习设置</h2></div>
+      <div class="setting-card">
+        <div class="setting-row">
+          <div class="setting-label"><b>发音口音</b><span>单词和句子的朗读口音</span></div>
+          <div class="segmented small" id="accentSeg">
+            <button class="seg" data-accent="us">美音</button>
+            <button class="seg" data-accent="uk">英音</button>
+          </div>
+        </div>
+        <div class="setting-row column">
+          <div class="setting-label between">
+            <div><b>朗读语速</b><span>慢一点，听得更清楚</span></div>
+            <em id="rateLabel">0.9x</em>
+          </div>
+          <input type="range" id="rateRange" min="0.6" max="1.2" step="0.1" value="0.9">
+        </div>
+        <div class="setting-row">
+          <div class="setting-label"><b>自动朗读</b><span>打开单词时自动播放发音</span></div>
+          <button class="switch" id="autoPlaySwitch" role="switch"><i></i></button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label"><b>每日目标</b><span>完成目标会获得额外星星</span></div>
+          <div class="goal-picks" id="goalPicks">
+            <button data-goal="5">5</button>
+            <button data-goal="10">10</button>
+            <button data-goal="15">15</button>
+            <button data-goal="20">20</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head"><h2>数据</h2></div>
+      <div class="setting-card">
+        <button class="setting-row link" id="resetBtn">
+          <div class="setting-label"><b>重置学习进度</b><span>清空星星、收藏和错词记录</span></div>
+          <span class="chev">›</span>
+        </button>
+      </div>
+
+      <div class="about">
+        <p><b>学英语神器</b> v1.0.0</p>
+        <p>自然拼读 · 六步记单词 · 语音跟读</p>
+        <p id="engineInfo">发音引擎：本地音频 + 系统 TTS</p>
+        <p id="screenInfo">屏幕：检测中…</p>
+        <p class="license-note">音素音频：CMU ARCTIC · SLT 女声</p>
+      </div>
+      <div class="home-tip"><b>🇬🇧 小提示</b><span>大声跟读 3 遍，比默看 10 遍更有效哦。</span></div>
+    </main>
+  </section>
+
+  <!-- ============ 巩固知识库 ============ -->
+  <section class="screen" id="screen-consolidate">
+    <header class="sub-hero consol-hero">
+      <div class="sub-hero-top">
+        <button class="icon-btn glass back-btn" id="consolBack" aria-label="返回"></button>
+        <h1>巩固知识库</h1>
+        <span class="icon-btn glass ghost-icon">🧠</span>
+      </div>
+      <p class="consol-sub">自由选词 · 专项强化 · 想练哪个就练哪个</p>
+      <div class="consol-stats">
+        <div><b id="consolTotal">0</b><span>词库总量</span></div>
+        <div><b id="consolKnown">0</b><span>已掌握</span></div>
+        <div><b id="consolWeak">0</b><span>待巩固</span></div>
+      </div>
+    </header>
+    <main class="sub-main consol-main">
+      <div class="grade-scroll">
+        <div class="grade-chips" id="consolGrades"></div>
+      </div>
+      <div class="consol-toolbar">
+        <button class="chip-btn" id="selectAllBtn">全选当前</button>
+        <button class="chip-btn" id="selectWrongBtn">错词</button>
+        <button class="chip-btn" id="selectFavBtn">收藏</button>
+        <button class="chip-btn" id="clearSelBtn">清空</button>
+        <span class="sel-count" id="selCount">已选 0 词</span>
+      </div>
+      <div class="word-grid" id="consolGrid"></div>
+      <div class="consol-start">
+        <button class="btn-ghost" id="randomDrill">🎲 随机 10 词</button>
+        <button class="btn-primary" id="startDrill">开始巩固 <span id="startCount">0</span></button>
+      </div>
+    </main>
+  </section>
+
+  <!-- ============ 巩固训练 ============ -->
+  <section class="screen drill-screen" id="screen-drill">
+    <div class="drill-shell">
+      <header class="learn-hero drill-hero">
+        <div class="learn-nav">
+          <button class="icon-btn glass back-btn" id="drillBack" aria-label="返回"></button>
+          <div class="learn-title">
+            <h1>知识库巩固</h1>
+            <p id="drillSub">第 1 / 10 个</p>
+          </div>
+          <span class="icon-btn glass ghost-icon">🧠</span>
+        </div>
+        <div class="drill-bar"><i id="drillBar"></i></div>
+      </header>
+      <div class="drill-scroll" id="drillScroll">
+        <div class="drill-card" id="drillCard"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 底部标签栏 ============ -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-screen="home">
+      <span class="tab-icon">🏠</span><span>首页</span>
+    </button>
+    <button class="tab" data-screen="consolidate">
+      <span class="tab-icon">🧠</span><span>巩固</span>
+    </button>
+    <button class="tab" data-screen="review">
+      <span class="tab-icon">📒</span><span>复习</span>
+    </button>
+    <button class="tab" data-screen="me">
+      <span class="tab-icon">🎓</span><span>我的</span>
+    </button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+  <div class="fx" id="fx"></div>
+  <div class="modal-mask" id="modalMask">
+    <div class="modal-card" id="modalCard"></div>
+  </div>
+</div>
+
+<script src="assets/pep_all.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/chunk_audio.js"></script>
+<script src="assets/app.js?v=20261114-screen"></script>
+</body>
+</html>

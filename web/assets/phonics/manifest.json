@@ -1,0 +1,580 @@
+{
+  "c_b": {
+    "duration": 0.18,
+    "end": 0.38,
+    "lead": 0.1,
+    "phoneme": "b",
+    "source": "Day12-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.3
+  },
+  "c_ch": {
+    "duration": 0.2,
+    "end": 0.41,
+    "lead": 0.1,
+    "phoneme": "tʃ",
+    "source": "Day18-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.31
+  },
+  "c_d": {
+    "duration": 0.18,
+    "end": 0.75,
+    "lead": 0.1,
+    "phoneme": "d",
+    "source": "Day13-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.67
+  },
+  "c_dh": {
+    "duration": 0.19,
+    "end": 0.25,
+    "lead": 0.05,
+    "phoneme": "ð",
+    "source": "Day17-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.11
+  },
+  "c_dr": {
+    "duration": 0.26,
+    "end": 0.41,
+    "lead": 0.1,
+    "phoneme": "dr",
+    "source": "Day20-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.25
+  },
+  "c_dz": {
+    "duration": 0.24,
+    "end": 0.47,
+    "lead": 0.1,
+    "phoneme": "dz",
+    "source": "Day21-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.33
+  },
+  "c_f": {
+    "duration": 0.29,
+    "end": 0.38,
+    "lead": 0.05,
+    "phoneme": "f",
+    "source": "Day14-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.14
+  },
+  "c_g": {
+    "duration": 0.18,
+    "end": 0.37,
+    "lead": 0.1,
+    "phoneme": "g",
+    "source": "Day13-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.29
+  },
+  "c_h": {
+    "duration": 0.26,
+    "end": 0.32,
+    "lead": 0.05,
+    "phoneme": "h",
+    "source": "Day16-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.11
+  },
+  "c_j": {
+    "duration": 0.22,
+    "end": 0.3,
+    "lead": 0.1,
+    "phoneme": "dʒ",
+    "source": "Day20-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.18
+  },
+  "c_k": {
+    "duration": 0.2,
+    "end": 0.46,
+    "lead": 0.1,
+    "phoneme": "k",
+    "source": "Day12-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.36
+  },
+  "c_l": {
+    "duration": 0.2,
+    "end": 0.37,
+    "lead": 0.05,
+    "phoneme": "l",
+    "source": "Day23-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.22
+  },
+  "c_m": {
+    "duration": 0.19,
+    "end": 0.4,
+    "lead": 0.05,
+    "phoneme": "m",
+    "source": "Day21-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.26
+  },
+  "c_n": {
+    "duration": 0.19,
+    "end": 0.43,
+    "lead": 0.05,
+    "phoneme": "n",
+    "source": "Day22-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.29
+  },
+  "c_ng": {
+    "duration": 0.21,
+    "end": 0.39,
+    "lead": 0.05,
+    "phoneme": "ŋ",
+    "source": "Day22-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.23
+  },
+  "c_p": {
+    "duration": 0.25,
+    "end": 0.27,
+    "lead": 0.1,
+    "phoneme": "p",
+    "source": "Day11-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.12
+  },
+  "c_r": {
+    "duration": 0.21,
+    "end": 0.38,
+    "lead": 0.05,
+    "phoneme": "r",
+    "source": "Day23-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.22
+  },
+  "c_s": {
+    "duration": 0.32,
+    "end": 0.4,
+    "lead": 0.05,
+    "phoneme": "s",
+    "source": "Day14-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.13
+  },
+  "c_sh": {
+    "duration": 0.31,
+    "end": 0.43,
+    "lead": 0.05,
+    "phoneme": "ʃ",
+    "source": "Day15-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.17
+  },
+  "c_t": {
+    "duration": 0.17,
+    "end": 0.23,
+    "lead": 0.1,
+    "phoneme": "t",
+    "source": "Day11-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.16
+  },
+  "c_th": {
+    "duration": 0.31,
+    "end": 0.55,
+    "lead": 0.05,
+    "phoneme": "θ",
+    "source": "Day15-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.29
+  },
+  "c_tr": {
+    "duration": 0.25,
+    "end": 0.28,
+    "lead": 0.1,
+    "phoneme": "tr",
+    "source": "Day19-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.13
+  },
+  "c_ts": {
+    "duration": 0.31,
+    "end": 0.36,
+    "lead": 0.1,
+    "phoneme": "ts",
+    "source": "Day19-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.15
+  },
+  "c_v": {
+    "duration": 0.2,
+    "end": 0.29,
+    "lead": 0.05,
+    "phoneme": "v",
+    "source": "Day16-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.14
+  },
+  "c_w": {
+    "duration": 0.21,
+    "end": 0.38,
+    "lead": 0.05,
+    "phoneme": "w",
+    "source": "Day24-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.22
+  },
+  "c_y": {
+    "duration": 0.21,
+    "end": 0.4,
+    "lead": 0.05,
+    "phoneme": "j",
+    "source": "Day24-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.24
+  },
+  "c_z": {
+    "duration": 0.21,
+    "end": 0.29,
+    "lead": 0.05,
+    "phoneme": "z",
+    "source": "Day17-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.13
+  },
+  "c_zh": {
+    "duration": 0.21,
+    "end": 0.53,
+    "lead": 0.05,
+    "phoneme": "ʒ",
+    "source": "Day18-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.37
+  },
+  "d_ai": {
+    "duration": 0.45,
+    "end": 0.77,
+    "lead": 0.05,
+    "phoneme": "aɪ",
+    "source": "Day7-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.37
+  },
+  "d_au": {
+    "duration": 0.45,
+    "end": 0.67,
+    "lead": 0.05,
+    "phoneme": "aʊ",
+    "source": "Day10-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.27
+  },
+  "d_ea": {
+    "duration": 0.45,
+    "end": 0.52,
+    "lead": 0.05,
+    "phoneme": "eə",
+    "source": "Day9-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.12
+  },
+  "d_ei": {
+    "duration": 0.45,
+    "end": 0.55,
+    "lead": 0.05,
+    "phoneme": "eɪ",
+    "source": "Day7-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.15
+  },
+  "d_ie": {
+    "duration": 0.38,
+    "end": 0.65,
+    "lead": 0.05,
+    "phoneme": "ɪə",
+    "source": "Day8-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.32
+  },
+  "d_o_us": {
+    "duration": 0.322,
+    "lead": 0.05,
+    "phoneme": "oʊ",
+    "source": "v_o_long + v_u_short",
+    "source_kind": "composite"
+  },
+  "d_oi": {
+    "duration": 0.45,
+    "end": 0.88,
+    "lead": 0.05,
+    "phoneme": "ɔɪ",
+    "source": "Day8-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.48
+  },
+  "d_ou": {
+    "duration": 0.45,
+    "end": 0.64,
+    "lead": 0.05,
+    "phoneme": "əʊ",
+    "source": "Day10-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.24
+  },
+  "d_ue": {
+    "duration": 0.41,
+    "end": 0.64,
+    "lead": 0.05,
+    "phoneme": "ʊə",
+    "source": "Day9-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.28
+  },
+  "l_clear": {
+    "duration": 0.2,
+    "end": 0.37,
+    "lead": 0.05,
+    "phoneme": "l",
+    "source": "Day23-2.MP3",
+    "source_kind": "course-phoneme-copy",
+    "start": 0.22
+  },
+  "l_dark": {
+    "duration": 0.17,
+    "end": 9.42,
+    "lead": 0.05,
+    "phoneme": "l_dark",
+    "source": "Day23-2.MP3",
+    "source_kind": "course-example-word",
+    "start": 9.3
+  },
+  "m_final": {
+    "duration": 0.19,
+    "end": 14.52,
+    "lead": 0.05,
+    "phoneme": "m_final",
+    "source": "Day21-2.MP3",
+    "source_kind": "course-example-word",
+    "start": 14.38
+  },
+  "n_final": {
+    "duration": 0.19,
+    "end": 0.43,
+    "lead": 0.05,
+    "phoneme": "n",
+    "source": "Day22-1.MP3",
+    "source_kind": "course-phoneme-copy",
+    "start": 0.29
+  },
+  "ng_final": {
+    "duration": 0.19,
+    "end": 14.9,
+    "lead": 0.05,
+    "phoneme": "ng_final",
+    "source": "Day22-2.MP3",
+    "source_kind": "course-example-word",
+    "start": 14.76
+  },
+  "r_ah": {
+    "duration": 0.417,
+    "lead": 0.05,
+    "phoneme": "r_ah",
+    "source": "v_a_long + c_r",
+    "source_kind": "composite"
+  },
+  "r_air_us": {
+    "duration": 0.267,
+    "lead": 0.05,
+    "phoneme": "r_air_us",
+    "source": "v_e + c_r",
+    "source_kind": "composite"
+  },
+  "r_aw": {
+    "duration": 0.417,
+    "lead": 0.05,
+    "phoneme": "r_aw",
+    "source": "v_o_long + c_r",
+    "source_kind": "composite"
+  },
+  "r_er": {
+    "duration": 0.417,
+    "lead": 0.05,
+    "phoneme": "r_er",
+    "source": "v_er_long + c_r",
+    "source_kind": "composite"
+  },
+  "r_initial": {
+    "duration": 0.13,
+    "end": 4.47,
+    "lead": 0.05,
+    "phoneme": "r_initial",
+    "source": "Day23-1.MP3",
+    "source_kind": "course-example-word",
+    "start": 4.39
+  },
+  "r_ir": {
+    "duration": 0.227,
+    "lead": 0.05,
+    "phoneme": "r_ir",
+    "source": "v_i_short + c_r",
+    "source_kind": "composite"
+  },
+  "r_oor": {
+    "duration": 0.267,
+    "lead": 0.05,
+    "phoneme": "r_oor",
+    "source": "v_u_short + c_r",
+    "source_kind": "composite"
+  },
+  "r_schwa": {
+    "duration": 0.277,
+    "lead": 0.05,
+    "phoneme": "r_schwa",
+    "source": "v_schwa + c_r",
+    "source_kind": "composite"
+  },
+  "t_final": {
+    "duration": 0.2,
+    "end": 11.08,
+    "lead": 0.1,
+    "phoneme": "t_final",
+    "source": "Day10-1.MP3",
+    "source_kind": "course-example-word",
+    "start": 10.98
+  },
+  "t_initial": {
+    "duration": 0.17,
+    "end": 0.23,
+    "lead": 0.1,
+    "phoneme": "t",
+    "source": "Day11-2.MP3",
+    "source_kind": "course-phoneme-copy",
+    "start": 0.16
+  },
+  "v_a_long": {
+    "duration": 0.45,
+    "end": 0.59,
+    "lead": 0.05,
+    "phoneme": "ɑː",
+    "source": "Day1-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.19
+  },
+  "v_ae": {
+    "duration": 0.2,
+    "end": 0.28,
+    "lead": 0.05,
+    "phoneme": "æ",
+    "source": "Day6-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.13
+  },
+  "v_e": {
+    "duration": 0.2,
+    "end": 0.35,
+    "lead": 0.05,
+    "phoneme": "e",
+    "source": "Day6-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.2
+  },
+  "v_er_long": {
+    "duration": 0.45,
+    "end": 0.58,
+    "lead": 0.05,
+    "phoneme": "ɜː",
+    "source": "Day2-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.18
+  },
+  "v_i_happy": {
+    "duration": 0.25,
+    "end": 0.61,
+    "lead": 0.05,
+    "phoneme": "iː",
+    "source": "Day1-2.MP3",
+    "source_kind": "course-phoneme-shortened",
+    "start": 0.21
+  },
+  "v_i_long": {
+    "duration": 0.45,
+    "end": 0.61,
+    "lead": 0.05,
+    "phoneme": "iː",
+    "source": "Day1-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.21
+  },
+  "v_i_short": {
+    "duration": 0.16,
+    "end": 0.28,
+    "lead": 0.05,
+    "phoneme": "ɪ",
+    "source": "Day4-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.17
+  },
+  "v_o_long": {
+    "duration": 0.45,
+    "end": 0.65,
+    "lead": 0.05,
+    "phoneme": "ɔː",
+    "source": "Day3-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.25
+  },
+  "v_o_short": {
+    "duration": 0.21,
+    "end": 0.55,
+    "lead": 0.05,
+    "phoneme": "ɒ",
+    "source": "Day5-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.39
+  },
+  "v_schwa": {
+    "duration": 0.21,
+    "end": 0.35,
+    "lead": 0.05,
+    "phoneme": "ə",
+    "source": "Day5-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.19
+  },
+  "v_u_long": {
+    "duration": 0.45,
+    "end": 0.75,
+    "lead": 0.05,
+    "phoneme": "uː",
+    "source": "Day2-1.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.35
+  },
+  "v_u_reduced": {
+    "duration": 0.25,
+    "end": 0.75,
+    "lead": 0.05,
+    "phoneme": "uː",
+    "source": "Day2-1.MP3",
+    "source_kind": "course-phoneme-shortened",
+    "start": 0.35
+  },
+  "v_u_short": {
+    "duration": 0.2,
+    "end": 0.41,
+    "lead": 0.05,
+    "phoneme": "ʊ",
+    "source": "Day4-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.26
+  },
+  "v_uh": {
+    "duration": 0.21,
+    "end": 0.34,
+    "lead": 0.05,
+    "phoneme": "ʌ",
+    "source": "Day3-2.MP3",
+    "source_kind": "course-phoneme",
+    "start": 0.18
+  }
+}
