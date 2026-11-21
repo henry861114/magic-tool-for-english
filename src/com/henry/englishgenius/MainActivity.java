@@ -18,6 +18,8 @@ import android.util.Log;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -99,9 +101,43 @@ public class MainActivity extends Activity {
         webView.setWebChromeClient(new WebChromeClient());
         webView.addJavascriptInterface(new Bridge(), "AndroidBridge");
         setContentView(webView);
+        applyImmersive();
         webView.loadUrl("file:///android_asset/index.html");
 
         initTts();
+    }
+
+    /**
+     * 沉浸式全屏：隐藏状态栏（时间/电量）和导航栏，从屏幕边缘下滑时临时呼出。
+     * API 30+ 用 WindowInsetsController，旧系统用 SystemUiVisibility。
+     */
+    private void applyImmersive() {
+        Window w = getWindow();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                w.setDecorFitsSystemWindows(false);
+                WindowInsetsController c = w.getInsetsController();
+                if (c != null) {
+                    c.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                    c.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                }
+            } else {
+                w.getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            }
+        } catch (Throwable ignored) { }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        // 从对话框/权限弹窗返回后，系统栏可能被重新显示，这里重新隐藏
+        if (hasFocus) applyImmersive();
     }
 
     /* ---------------- TTS ---------------- */

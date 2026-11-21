@@ -331,7 +331,10 @@ b, strong { font-weight: 800; }
   font-size: 14px; font-weight: 800;
   border: 2px solid transparent;
   transition: all .25s ease;
+  white-space: nowrap;
 }
+/* 「拆拼」是两个字：允许加宽为胶囊形，避免圆点内换行 */
+.step .dot.wide { width: auto; min-width: 38px; padding: 0 8px; border-radius: 999px; font-size: 11.5px; letter-spacing: -.5px; }
 .step.done .dot { background: linear-gradient(140deg, #F8AC56, #E87617); color: #fff; box-shadow: 0 4px 10px rgba(232, 118, 24, .25); }
 .step.current .dot {
   background: #fff; color: var(--orange-deep);
@@ -1380,7 +1383,6 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 /* 四步流程 */
-.step .dot.wide { font-size: 11.5px; letter-spacing: -.5px; }
 /* 自动拆拼：单字母打乱重组 */
 .assemble-stage { padding-top: 2px; }
 .assemble-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
@@ -1484,15 +1486,97 @@ input[type="range"]::-webkit-slider-thumb {
   .word-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 }
 
-/* 横屏且高度较小时收紧顶部/底部，给内容留空间 */
+/* ================= 横屏适配 =================
+   横屏高度有限，按「压缩 + 精简」分层处理：
+   1) 平板横屏（高度 ≤840px）：收紧头部/底部，缩小间距与插图；
+   2) 更矮的横屏（≤620px）：继续收紧，隐藏装饰与提示类文字；
+   3) 手机横屏（≤460px）：大幅精简次要文字，保证一屏完整显示。
+   三层规则向下叠加，后面的层覆盖前面的层。 */
+
+/* —— 1. 平板横屏：整体压缩 —— */
+@media (orientation: landscape) and (min-width: 720px) and (max-height: 840px) {
+  /* 首页 */
+  .home-hero { padding: 12px 20px 50px; }
+  .home-hero h1 { font-size: 23px; }
+  .hero-sub { font-size: 12px; margin-top: 4px; }
+  .hero-stats { margin-top: 9px; gap: 6px; }
+  .hero-chip { padding: 4px 9px; font-size: 11px; }
+  .home-main { margin-top: -36px; }
+  .section-head { margin: 16px 0 10px; }
+  .home-tip { margin: 14px 0 8px; padding: 10px 13px; }
+  .progress-card { padding: 12px 14px; gap: 12px; }
+  .ring { width: 68px; height: 68px; }
+  .ring-inner b { font-size: 20px; }
+  .unit-card { padding: 10px 12px; }
+  .unit-emoji { width: 44px; height: 44px; font-size: 22px; }
+  .quick-tile { padding: 11px 12px; }
+
+  /* 子页面头部（复习 / 我的 / 巩固） */
+  .sub-hero { padding: 10px 18px 12px; }
+  #reviewTabs { margin-top: 9px; }
+  .consol-hero { padding-bottom: 12px; }
+  .consol-stats { margin-top: 9px; }
+  .me-hero { padding-bottom: 12px; }
+  .me-summary { margin-top: 10px; }
+  .review-hint { padding: 10px 4px 8px; }
+
+  /* 学单词 / 巩固训练
+     顶栏与单词条合并为一行：返回 | Unit · 主题 | ★ | 单词条（可横滑） */
+  .learn-hero { padding: 8px 18px 10px; display: flex; align-items: center; gap: 10px; }
+  .learn-nav { flex: 0 0 auto; gap: 10px; }
+  .learn-title { flex: 0 1 auto; text-align: left; }
+  .learn-title h1 { font-size: 16px; }
+  .learn-title p { display: none; }
+  .word-strip-wrap { flex: 1 1 auto; margin-top: 0; min-width: 0; }
+  .learn-card, .drill-card { padding: 12px 14px 14px; }
+  .stepper { margin: 2px 2px 10px; }
+  .step .dot { width: 32px; height: 32px; font-size: 13px; }
+  .step .dot.wide { min-width: 32px; padding: 0 6px; font-size: 12px; }
+  .step-progress { top: 14px; }
+  .learn-tip { padding: 8px 0 2px; }
+  .learn-footer { padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); }
+  .learn-footer .btn-primary, .learn-footer .btn-ghost { height: 46px; font-size: 14px; }
+  .illustration { height: 104px; margin-top: 10px; }
+  .illustration.has-img { height: 120px; }
+  .illustration.has-img .word-img { width: 84px; height: 84px; }
+  .write-card { height: 160px; }
+  .mic-btn { width: 76px; height: 76px; }
+  .mic-ring { width: 84px; height: 84px; }
+  .mic-wrap { margin: 14px 0 4px; }
+  .quiz-blank { min-width: 48px; height: 48px; font-size: 20px; }
+  .option { padding: 10px 12px; font-size: 13.5px; }
+  .score-num { font-size: 28px; }
+  .drill-illu { width: 78px; height: 78px; font-size: 38px; margin-top: 10px; }
+  .drill-card .word-tiles { padding-top: 10px; }
+  .drill-card .tile { height: 48px; font-size: 26px; }
+  .drill-q { margin-top: 10px; font-size: 13.5px; }
+  .drill-actions .btn-primary, .drill-actions .btn-ghost { height: 42px; }
+
+  /* 内容不满一屏时垂直居中（内容超高时自动回退顶部对齐，不会裁切） */
+  .learn-scroll, .drill-scroll { display: flex; flex-direction: column; }
+  .learn-card, .drill-card { margin: auto; width: 100%; max-width: 680px; }
+
+  /* 次要说明文字在横屏下隐藏 */
+  .read-engine-note, .mic-safe-note { display: none; }
+}
+
+/* —— 2. 更矮的横屏（手机 / 小平板）：收紧顶部/底部，给内容留空间 —— */
 @media (orientation: landscape) and (max-height: 620px) {
-  .learn-hero { padding: 6px 18px 8px; }
-  .learn-title h1 { font-size: 15px; }
-  .word-strip-wrap { margin-top: 6px; }
+  .learn-hero { padding: 6px 18px 8px; display: flex; align-items: center; gap: 10px; }
+  .learn-nav { flex: 0 0 auto; gap: 10px; }
+  .learn-title { flex: 0 1 auto; text-align: left; }
+  .word-strip-wrap { flex: 1 1 auto; margin-top: 0; min-width: 0; }
   .learn-footer { padding: 6px 16px calc(6px + env(safe-area-inset-bottom)); }
+  .learn-footer .btn-primary, .learn-footer .btn-ghost { height: 40px; font-size: 13px; }
   .learn-tip { display: none; }
   .tabbar { padding-top: 3px; padding-bottom: calc(3px + env(safe-area-inset-bottom)); }
+  .tab { font-size: 9.5px; }
   .tab .tab-icon { font-size: 17px; }
+  .screen { padding-bottom: 78px; }
+
+  /* 内容不满一屏时垂直居中 */
+  .learn-scroll, .drill-scroll { display: flex; flex-direction: column; }
+  .learn-card, .drill-card { margin: auto; width: 100%; max-width: 680px; }
 
   /* 横屏矮屏下压缩知识库头部，给词表留出可视区域 */
   .consol-hero { padding: 8px 16px 10px; }
@@ -1504,6 +1588,212 @@ input[type="range"]::-webkit-slider-thumb {
   .consol-toolbar { margin: 0 0 8px; }
   .consol-start { bottom: calc(54px + env(safe-area-inset-bottom)); padding: 6px; }
   .consol-start .btn-primary, .consol-start .btn-ghost { height: 38px; font-size: 12.5px; }
+
+  /* 首页：装饰气泡隐藏，副标题与四步法提示移除 */
+  .hero-bubble { display: none; }
+  .home-hero { padding: 10px 20px 46px; }
+  .home-hero h1 { font-size: 21px; }
+  .hero-sub { display: none; }
+  .hero-stats { margin-top: 7px; }
+  .home-main { margin-top: -32px; }
+  .section-head { margin: 12px 0 8px; }
+  .home-tip { display: none; }
+
+  /* 我的 / 复习：压缩摘要区 */
+  .sub-hero { padding: 8px 18px 12px; }
+  #reviewTabs { margin-top: 8px; }
+  .review-hint { padding: 8px 4px 6px; }
+  .me-hero { padding-bottom: 10px; }
+  .me-summary { margin-top: 8px; }
+  .me-avatar { width: 46px; height: 46px; font-size: 24px; }
+
+  /* 矮横屏：学习 / 巩固卡片改为左右分栏，把插图、例句和次要按钮移到边上，
+     核心内容（单词块 / 音标 / 释义 / 输入区）留在左侧，保证一屏显示。 */
+  .learn-scroll { padding: 8px 12px 2px; }
+  #stage,
+  .quiz-stage, .write-stage, .assemble-stage, .split-stage, .spell-stage,
+  .drill-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    column-gap: 16px;
+    align-content: start;
+    align-items: start;
+    grid-auto-flow: row dense;
+  }
+  /* 学（#stage 直接子元素） */
+  #stage > .word-head, #stage > .chunk-map, #stage > .phonics-tip, #stage > .split-note { grid-column: 1; }
+  #stage > .illustration, #stage > .sentence-card { grid-column: 2; }
+  #stage > .quiz-stage, #stage > .write-stage, #stage > .assemble-stage,
+  #stage > .split-stage, #stage > .spell-stage { grid-column: 1 / -1; }
+  /* 练：题目在左，单词在右居中（同一行），选项 2 列铺满下方 */
+  .quiz-stage > .quiz-eyebrow { grid-column: 1; }
+  .quiz-stage > .quiz-title { grid-column: 1; align-self: center; }
+  .quiz-stage > .quiz-word, .quiz-stage > div:not([class]) { grid-column: 2; justify-self: center; }
+  .quiz-stage > .options { grid-column: 1 / -1; }
+  .quiz-stage > .feedback, .quiz-stage > .quiz-actions { grid-column: 1 / -1; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 14px; }
+  /* 写：音标/释义在左、按钮在右，画板横跨全宽（手写区不能太窄） */
+  .write-stage > .write-head { grid-column: 1; }
+  .write-stage > .write-tools { grid-column: 2; justify-self: end; }
+  .write-stage > .write-card, .write-stage > #writeResult, .write-stage > .spell-tip { grid-column: 1 / -1; }
+  /* 拆拼：音素/槽位在左，打乱的字母库在右；释义在音素同行右侧 */
+  .assemble-stage > .assemble-head { grid-column: 2; align-self: center; }
+  .assemble-stage > div:not([class]) { grid-column: 1; justify-self: start; }
+  .assemble-stage > .assemble-title { grid-column: 1 / -1; }
+  .assemble-stage > .letter-slots, .assemble-stage > .split-slots, .assemble-stage > .spell-slots { grid-column: 1; }
+  .assemble-stage > .letter-bank, .assemble-stage > .spell-bank { grid-column: 2; }
+  .assemble-stage > .assemble-shuffle, .assemble-stage > .split-reset { grid-column: 2; }
+  .assemble-stage > .success-panel { grid-column: 1 / -1; }
+  /* 巩固训练 */
+  .drill-card > .drill-meta, .drill-card > .word-tiles,
+  .drill-card > .drill-q, .drill-card > .drill-answer,
+  .drill-card > div:not([class]) { grid-column: 1; }
+  .drill-card > .drill-illu, .drill-card > .drill-reveal { grid-column: 2; }
+  .drill-card > .drill-actions, .drill-card > .drill-summary { grid-column: 1 / -1; }
+}
+
+/* —— 3. 手机横屏：大幅精简次要文字，保证一屏显示 —— */
+@media (orientation: landscape) and (max-height: 460px) {
+  /* 首页：只保留标题、星星与主入口 */
+  .hero-date { display: none; }
+  .home-hero { padding: 8px 18px 40px; border-radius: 0 0 22px 22px; }
+  .home-hero h1 { font-size: 19px; }
+  .hero-chip { padding: 3px 8px; font-size: 10.5px; }
+  .home-main { margin-top: -28px; }
+  .section-head { margin: 10px 0 7px; }
+  .section-head h2 { font-size: 15px; }
+  .progress-card { padding: 10px 12px; gap: 10px; }
+  .ring { width: 56px; height: 56px; }
+  .ring-inner b { font-size: 17px; }
+  .progress-info h2 { font-size: 14px; }
+  .progress-info p { margin: 2px 0 7px; }
+  .quick-tile { padding: 9px 11px; }
+  .q-sub { display: none; }
+  .unit-card { padding: 8px 11px; gap: 10px; }
+  .unit-emoji { width: 40px; height: 40px; font-size: 20px; }
+  .unit-line .unit-theme { display: none; }
+  .screen { padding-bottom: 64px; }
+
+  /* 我的：版本信息等次要文字隐藏 */
+  .about { display: none; }
+  .me-summary p { display: none; }
+  .stat-card { padding: 9px 6px; }
+  .stat-card b { font-size: 18px; }
+
+  /* 学习页头部：单行化（返回 | Unit 1 | ★ | 单词条），导航按钮压小 */
+  .learn-hero { padding: 5px 14px 7px; }
+  .learn-footer { padding: 5px 14px calc(5px + env(safe-area-inset-bottom)); }
+  .learn-footer .btn-primary, .learn-footer .btn-ghost { height: 38px; font-size: 12.5px; }
+  .learn-title h1 { font-size: 16px; }
+  .learn-title p { display: none; }
+  .learn-nav .icon-btn { width: 30px; height: 30px; }
+  .learn-nav .icon-btn svg { width: 17px; height: 17px; }
+  .word-chip { padding: 4px 10px; font-size: 12px; }
+
+  /* 学习卡片：整体压缩，隐藏提示类文字 */
+  .learn-card, .drill-card { padding: 8px 12px 10px; }
+  .stepper { margin: 0 2px 6px; }
+  .step .dot { width: 28px; height: 28px; font-size: 11.5px; }
+  .step .dot.wide { min-width: 30px; padding: 0 5px; font-size: 10.5px; }
+  .step-progress { top: 12px; }
+  .tile { min-width: 30px; height: 38px; font-size: 21px; border-radius: 11px; }
+  .word-tools { gap: 12px; margin: 2px 0 6px; }
+  .tool { font-size: 9px; }
+  .tool span:first-child { font-size: 14px; }
+  .ipa-pill { padding: 3px 8px 3px 10px; font-size: 12.5px; gap: 5px; }
+  .ipa-pill .spk { width: 22px; height: 22px; }
+  .ipa-pill .spk svg { width: 12px; height: 12px; }
+  .meaning { margin-top: 4px; font-size: 12.5px; }
+  .meaning small { display: none; }
+  .chunk-map { margin-top: 10px; gap: 5px; }
+  .chunk { min-width: 40px; padding: 4px 6px 3px; gap: 1px; }
+  .chunk b { font-size: 15px; }
+  .chunk span { font-size: 9px; min-height: 13px; }
+  .illustration { height: 70px; margin-top: 8px; border-radius: 14px; }
+  .illustration .big-emoji { font-size: 38px; }
+  .illustration .word-caption { display: none; }
+  .illustration.has-img { height: 80px; }
+  .illustration.has-img .word-img { width: 60px; height: 60px; border-radius: 12px; }
+  .sentence-card { margin-top: 8px; padding: 8px 10px; gap: 7px; }
+  .sentence-en { font-size: 12px; }
+  .sentence-cn { display: none; }
+  .mini-spk { width: 26px; height: 26px; }
+  .mini-spk svg { width: 13px; height: 13px; }
+  .read-sub, .mic-hint, .quiz-eyebrow,
+  .spell-tip, .assemble-tip, .phonics-tip, .drill-hint { display: none; }
+  .split-note { font-size: 11px; line-height: 1.5; }
+
+  /* 练：选项改为 2 列网格铺满下方，省一半高度 */
+  .quiz-title { font-size: 14px; }
+  .quiz-word .tile { height: 36px; font-size: 20px; min-width: 28px; }
+  .quiz-stage > .options { grid-column: 1 / -1; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 10px; }
+  .option { padding: 7px 10px; font-size: 12.5px; gap: 7px; }
+  .option .opt-key { width: 20px; height: 20px; font-size: 11px; }
+  .option .opt-sub { display: none; }
+  .quiz-actions .btn-primary, .quiz-actions .btn-ghost { height: 40px; font-size: 13.5px; }
+  .feedback { margin-top: 8px; padding: 9px 12px; font-size: 12px; }
+
+  /* 拆拼：隐藏说明文字，字母槽与字母库压缩 */
+  .assemble-title { display: none; }
+  .assemble-head .assemble-emoji { width: 32px; height: 32px; font-size: 18px; border-radius: 10px; }
+  .assemble-stage > div:not([class]) { margin-top: 6px; }
+  .letter-slots { min-height: 44px; margin: 8px 0 8px; gap: 4px; }
+  .letter-slot { min-width: 32px; height: 44px; font-size: 19px; }
+  .letter-bank { padding: 8px; gap: 5px; min-height: 52px; }
+  .letter-piece { min-width: 34px; height: 40px; font-size: 19px; }
+  .assemble-shuffle { height: 32px; margin: 8px auto 0; padding: 0 14px; font-size: 11.5px; }
+  .spell-slots { margin: 8px 0; }
+  .slot { min-width: 44px; height: 44px; font-size: 18px; }
+  .spell-bank { padding: 8px; min-height: 56px; }
+  .piece { min-width: 44px; padding: 9px 11px; font-size: 18px; }
+
+  /* 写：画板压小，结果面板移到全宽 */
+  .write-head .ipa-pill { margin-top: 0; }
+  .write-card { height: 110px; margin: 8px 0; border-radius: 14px; }
+  .write-watermark { font-size: 12px; }
+  .write-tools { gap: 8px; }
+  .write-tools .btn-ghost { height: 34px; padding: 0 12px; font-size: 12px; }
+  .write-tools .btn-primary { height: 34px; padding: 0 18px; font-size: 12.5px; }
+  .write-stage > #writeResult { grid-column: 1 / -1; }
+  .write-result { margin-top: 6px; padding: 8px 10px; }
+  .write-result .answer-word { font-size: 19px; margin-top: 4px; }
+
+  /* 完成面板：全宽 + 压缩 */
+  .success-panel { grid-column: 1 / -1; margin-top: 8px; padding: 10px 12px; }
+  .success-panel .sp-title { font-size: 15px; }
+  .success-panel .sp-sub { font-size: 10.5px; margin: 3px 0 8px; }
+  .success-panel .word-again { font-size: 16px; }
+  .success-panel .btn-primary { height: 36px; padding: 0 18px; font-size: 13px; }
+  /* 拆拼完成时收起已拼好的字母区，给成功面板腾出空间 */
+  .assemble-stage:has(.success-panel) > .letter-slots,
+  .assemble-stage:has(.success-panel) > .assemble-title,
+  .assemble-stage:has(.success-panel) > div:not([class]) { display: none; }
+
+  /* 巩固训练 */
+  .drill-hero { padding-bottom: 8px; }
+  .drill-bar { margin-top: 6px; height: 5px; }
+  .drill-card .word-tiles { padding-top: 6px; }
+  .drill-card .tile { min-width: 30px; height: 36px; font-size: 20px; }
+  .drill-card .ipa-pill { margin-top: 6px; }
+  .drill-illu { width: 56px; height: 56px; font-size: 26px; margin-top: 6px; }
+  .drill-q { margin-top: 6px; font-size: 12.5px; }
+  .drill-q small { font-size: 10.5px; }
+  .drill-reveal { height: 36px; margin-top: 8px; padding: 0 16px; font-size: 12.5px; }
+  .drill-answer .meaning { font-size: 14px; }
+  .drill-chunks .chunk-map { margin-top: 6px; }
+  .drill-actions { padding-top: 10px; gap: 8px; }
+  .drill-actions .btn-ghost, .drill-actions .btn-primary { height: 40px; font-size: 13px; }
+  .drill-summary .e-emoji { font-size: 40px; }
+  .drill-summary h2 { font-size: 17px; }
+  .drill-summary .stat-card b { font-size: 15px; }
+  .drill-summary .sum-actions .btn-primary,
+  .drill-summary .sum-actions .btn-ghost { height: 40px; font-size: 13.5px; }
+
+  /* 结果面板 / 弹窗压缩 */
+  .score-box { padding: 10px 12px; }
+  .score-num { font-size: 26px; }
+  .success-panel { margin-top: 8px; }
 }
 
 /* ================= 分辨率检测（app.js 前置脚本写入 data-layout） =================
@@ -1511,6 +1801,9 @@ input[type="range"]::-webkit-slider-thumb {
    实际栅格列数由 --layout-cols 决定（手机 2 → 1920 级 7）。 */
 html[data-layout="phone"] .app, html[data-layout="phone"] .tabbar { max-width: 460px; }
 html[data-layout="phone"] .consol-start { max-width: 428px; }
+/* 平板竖屏（高密度导致 CSS 宽度 520–719）：铺满全宽，不再按手机 460px 居中 */
+html[data-layout="tab-xs"] .app, html[data-layout="tab-xs"] .tabbar { max-width: none; box-shadow: none; }
+html[data-layout="tab-xs"] .consol-start { max-width: calc(100% - 32px); }
 html[data-layout="tab-sm"] .app, html[data-layout="tab-sm"] .tabbar { max-width: 860px; }
 html[data-layout="tab-sm"] .consol-start { max-width: 828px; }
 html[data-layout="tab"] .app, html[data-layout="tab"] .tabbar { max-width: 1120px; }
