@@ -1919,7 +1919,8 @@
       (word.sentence ? '<div class="sentence-card">' +
         '<div class="sentence-body"><div class="sentence-en">' + esc(word.sentence) + '</div><div class="sentence-cn">' + esc(word.sentenceCn) + '</div></div>' +
         '<button class="mini-spk" data-speak-sentence="1" aria-label="朗读例句">' + I.speaker + '</button>' +
-        '</div>' : '');
+        '</div>' : '') +
+      '<button class="stage-jump" id="jumpQuiz">去练一练 ›</button>';
   }
 
   /* ---------- 读（旧版六步模型遗留，四步流程不调用） ---------- */
@@ -2155,6 +2156,7 @@
       '<div class="options">' + opts + '</div>' +
       feedback +
       actions +
+      '<button class="stage-jump" id="jumpSplit">去拆一拆 ›</button>' +
       '</div>';
   }
 
@@ -2404,6 +2406,7 @@
       success +
       (assembleSolved ? '' : '<div class="assemble-tip">点击字母放入上方空格，会读它在单词里的发音；点已放入的字母可以取回</div>' +
         '<button class="btn-ghost assemble-shuffle" id="assembleShuffle">🔀 重新打乱</button>') +
+      '<button class="stage-jump" id="jumpWrite">去写一写 ›</button>' +
       '</div>';
   }
 
@@ -2679,16 +2682,25 @@
   }
 
   /* ---------- 写一写：手动对照答案 ---------- */
+  /* 写步骤的结果面板：有内容时给容器加 has-result，横屏下与画板左右并排 */
+  function setWriteResult(html) {
+    const res = $('#writeResult');
+    if (!res) return;
+    res.innerHTML = html;
+    const stage = res.closest('.write-stage');
+    if (stage) stage.classList.toggle('has-result', !!html);
+  }
+
   function showWriteConfirm(word) {
     const res = $('#writeResult');
     if (!res) return;
-    res.innerHTML = '<div class="write-result">' +
+    setWriteResult('<div class="write-result">' +
       '<div class="check-badge">✍️ 对照标准答案</div>' +
       '<p>你写完啦，和下面的标准拼写对照一下：</p>' +
       '<div class="answer-word">' + esc(word.w) + '</div>' +
       '<p>' + esc(word.ipa) + ' · ' + esc(word.cn) + '</p>' +
       '<div class="row"><button class="btn-primary" id="selfCorrect">✅ 我写对了</button><button class="btn-ghost" id="writeRetry2">🔁 再写一次</button></div>' +
-      '</div>';
+      '</div>');
     const ok = $('#selfCorrect');
     if (ok) ok.addEventListener('click', function () { writeSuccess(word); });
     const retry = $('#writeRetry2');
@@ -2717,14 +2729,27 @@
       '</div>';
   }
 
-  function initWriteCanvas() {
+  /* 按当前尺寸重建手写画板位图（保留已有笔迹，拉伸映射到新尺寸） */
+  function setupWriteCanvasBitmap() {
     const card = $('#writeCard');
     const canvas = $('#writeCanvas');
-    if (!card || !canvas) return;
+    if (!card || !canvas || !canvas.parentNode) return false;
     const rect = card.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 3);
-    canvas.width = Math.max(1, Math.round(rect.width * dpr));
-    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    const w = Math.max(1, Math.round(rect.width * dpr));
+    const h = Math.max(1, Math.round(rect.height * dpr));
+    if (canvas.width === w && canvas.height === h && writeCtx) return true;
+    let snapshot = null;
+    if (writeInk > 0 && canvas.width > 0 && canvas.height > 0) {
+      try {
+        snapshot = document.createElement('canvas');
+        snapshot.width = canvas.width;
+        snapshot.height = canvas.height;
+        snapshot.getContext('2d').drawImage(canvas, 0, 0);
+      } catch (e) { snapshot = null; }
+    }
+    canvas.width = w;
+    canvas.height = h;
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
     ctx.lineCap = 'round';
@@ -2732,6 +2757,20 @@
     ctx.lineWidth = 3.4;
     ctx.strokeStyle = '#3C79C6';
     writeCtx = ctx;
+    if (snapshot) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(snapshot, 0, 0, w, h);
+      ctx.restore();
+    }
+    return true;
+  }
+
+  function initWriteCanvas() {
+    const card = $('#writeCard');
+    const canvas = $('#writeCanvas');
+    if (!card || !canvas) return;
+    setupWriteCanvasBitmap();
     writeInk = 0;
     let drawing = false;
     let last = null;
@@ -2746,10 +2785,10 @@
       try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
       drawing = true;
       last = pos(e);
-      ctx.beginPath();
-      ctx.moveTo(last.x, last.y);
-      ctx.lineTo(last.x + 0.01, last.y + 0.01);
-      ctx.stroke();
+      writeCtx.beginPath();
+      writeCtx.moveTo(last.x, last.y);
+      writeCtx.lineTo(last.x + 0.01, last.y + 0.01);
+      writeCtx.stroke();
       const mark = $('#writeMark');
       if (mark) mark.classList.add('hide');
     });
@@ -2757,10 +2796,10 @@
       if (!drawing) return;
       e.preventDefault();
       const p = pos(e);
-      ctx.beginPath();
-      ctx.moveTo(last.x, last.y);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
+      writeCtx.beginPath();
+      writeCtx.moveTo(last.x, last.y);
+      writeCtx.lineTo(p.x, p.y);
+      writeCtx.stroke();
       last = p;
       writeInk++;
     });
@@ -2769,6 +2808,19 @@
     canvas.addEventListener('pointercancel', endDraw);
     canvas.addEventListener('pointerleave', function () { if (drawing) endDraw(); });
   }
+
+  /* 横竖屏切换 / 分屏后重建手写画板位图，修正笔迹坐标错位 */
+  let writeCanvasResizeTimer = null;
+  function handleWriteCanvasResize() {
+    clearTimeout(writeCanvasResizeTimer);
+    writeCanvasResizeTimer = setTimeout(function () {
+      if (currentScreen === 'learn' && currentStep === 3 && $('#writeCanvas')) {
+        setupWriteCanvasBitmap();
+      }
+    }, 200);
+  }
+  window.addEventListener('resize', handleWriteCanvasResize);
+  window.addEventListener('orientationchange', function () { setTimeout(handleWriteCanvasResize, 250); });
 
   function toggleKeyboard() {
     const input = $('#writeInput');
@@ -2792,8 +2844,7 @@
     if (mark) mark.classList.remove('hide');
     const input = $('#writeInput');
     if (input) input.value = '';
-    const res = $('#writeResult');
-    if (res) res.innerHTML = '';
+    setWriteResult('');
   }
 
   function submitWrite() {
@@ -2812,14 +2863,14 @@
         save();
         const res = $('#writeResult');
         if (res) {
-          res.innerHTML = '<div class="write-result">' +
+          setWriteResult('<div class="write-result">' +
             '<p>你写的是 <b>' + esc(val) + '</b>，还差一点点</p>' +
             '<div class="answer-word">' + esc(word.w) + '</div>' +
             '<p>正确拼写对照一下，再试一次吧</p>' +
             '<div class="row"><button class="btn-primary" id="writeRetry">再写一次</button></div>' +
-            '</div>';
+            '</div>');
           const b = $('#writeRetry');
-          if (b) b.addEventListener('click', function () { input.value = ''; res.innerHTML = ''; input.focus(); });
+          if (b) b.addEventListener('click', function () { input.value = ''; setWriteResult(''); input.focus(); });
         }
       }
       return;
@@ -2838,7 +2889,7 @@
     updateStepper();
     const res = $('#writeResult');
     if (res) {
-      res.innerHTML = '<div class="success-panel">' +
+      setWriteResult('<div class="success-panel">' +
         '<div class="word-again">' + esc(word.w) + '</div>' +
         '<div class="sp-title">' + '🎉 写对啦！' + '</div>' +
         '<div class="sp-sub">' + esc(word.cn) + ' · 已完成四步学习' + (newly ? '<br>+8 星星，继续加油！' : '') + '</div>' +
@@ -2846,7 +2897,7 @@
         '<button class="btn-primary" id="successNext">下一个单词 →</button>' +
         '<button class="btn-ghost" id="successAgain" style="height:44px;padding:0 16px;font-size:13.5px">再写一次</button>' +
         '</div>' +
-        '</div>';
+        '</div>');
       const next = $('#successNext');
       if (next) next.addEventListener('click', function () { moveWord(1); });
       const again = $('#successAgain');
@@ -2864,6 +2915,8 @@
     if (currentStep === 0) {
       const split = $('#toolSplit');
       if (split) split.addEventListener('click', function () { setStep(2); });
+      const jumpQuiz = $('#jumpQuiz');
+      if (jumpQuiz) jumpQuiz.addEventListener('click', function () { setStep(1); });
       const link = $('#toolLink');
       if (link) link.addEventListener('click', function () { pronounceWord(word, true); toast('跟着拼读，慢一点更清楚'); });
       const fav = $('#toolFav');
@@ -2891,11 +2944,15 @@
       });
       const goSplit = $('#quizGoSplit');
       if (goSplit) goSplit.addEventListener('click', function () { setStep(2); });
+      const jumpSplit = $('#jumpSplit');
+      if (jumpSplit) jumpSplit.addEventListener('click', function () { setStep(2); });
     }
 
     if (currentStep === 2) {
       const next = $('#assembleNext');
       if (next) next.addEventListener('click', function () { setStep(3); });
+      const jumpWrite = $('#jumpWrite');
+      if (jumpWrite) jumpWrite.addEventListener('click', function () { setStep(3); });
       const sh = $('#assembleShuffle');
       if (sh) sh.addEventListener('click', function () {
         assembleSlots = [];
